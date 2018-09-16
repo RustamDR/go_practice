@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 )
 
 type pipeType struct {
@@ -15,6 +17,10 @@ type Primes chan int
 // Method emulates getting primes using "Sieve Of Eratosphene"
 // Returns Primes - chanel with source of primes less or equal limit
 func GetPrimes(limit int) Primes {
+
+	if limit < 2 {
+		panic("number should be >=2")
+	}
 
 	allNumbers, primes := make(chan int, 100), make(Primes, 100) // Creating the chanel for all sorted numbers including limit
 	go func() {
@@ -62,7 +68,18 @@ func addFilter(pipe pipeType) {
 }
 
 func main() {
-	for prime := range GetPrimes(1000000) {
+
+	if len(os.Args) != 2 {
+		panic("usage: go run main.go <int number>")
+	}
+
+	limit, err := strconv.Atoi(os.Args[1])
+
+	if err != nil {
+		panic("number should be int")
+	}
+
+	for prime := range GetPrimes(limit) {
 		fmt.Println(prime)
 	}
 }
